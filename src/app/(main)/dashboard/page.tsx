@@ -1,0 +1,57 @@
+import { authOptions } from "@/lib/auth";
+import db from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import React from "react";
+import Thumbnail from "../components/Thumbnail";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+async function Dashboard() {
+  const serverSession = await getServerSession(authOptions);
+  const user = await db.user.findUnique({
+    where: {
+      id: serverSession?.user.id,
+    },
+    select: {
+      credits: true,
+    },
+  });
+
+  return (
+    <div className="flex min-h-screen w-full flex-col items-center md:max-w-3xl px-4 py-6 mt-16">
+      <div className="flex max-w-full flex-col items-center gap-18">
+        {user?.credits ? (
+          <div className="flex flex-col px-10 gap-2">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-instrument-serif tracking-tight text-center">
+              Hello!{" "}
+              {serverSession?.user.name ? serverSession?.user.name : "Guest"}
+            </h1>
+            <h2 className="text-md md:text-lg lg:text-lg tracking-tight text-center text-muted-foreground">
+              Get started by creating beautiful thumbnails for your content
+            </h2>
+            <div className="flex flex-col items-center justify-center mt-10">
+              <Thumbnail />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 max-w-2xl mt-24 text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-instrument-serif tracking-tight">
+              Oops! You're out of credits!
+            </h1>
+            <span className="text-sm text-muted-foreground">
+              Please purchase more credits to continue creating captivating
+              thumbnails.
+            </span>
+            <Button asChild>
+              <Link href={"/pricing"} className="cursor-pointer text-sm">
+                Upgrade
+              </Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;
