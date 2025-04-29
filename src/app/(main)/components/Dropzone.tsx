@@ -44,7 +44,7 @@ const Dropzone = (props: DropzoneProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
+    <div className="flex flex-col items-center justify-center w-full">
       <input
         className="hidden"
         type="file"

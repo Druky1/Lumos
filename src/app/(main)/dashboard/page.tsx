@@ -22,16 +22,10 @@ async function Dashboard() {
       <div className="flex max-w-full flex-col items-center gap-18">
         {user?.credits ? (
           <div className="flex flex-col px-10 gap-2">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-instrument-serif tracking-tight text-center">
-              Hello!{" "}
-              {serverSession?.user.name ? serverSession?.user.name : "Guest"}
-            </h1>
-            <h2 className="text-md md:text-lg lg:text-lg tracking-tight text-center text-muted-foreground">
-              Get started by creating beautiful thumbnails for your content
-            </h2>
-            <div className="flex flex-col items-center justify-center mt-10">
-              <Thumbnail />
-            </div>
+            {/* The Thumbnail component will handle showing/hiding this content */}
+            <Thumbnail 
+              userName={serverSession?.user.name ? serverSession.user.name : "Guest"}
+            />
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 max-w-2xl mt-24 text-center">
