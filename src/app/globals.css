@@ -124,3 +124,11 @@
 .font-instrument-serif {
   font-family: var(--font-instrument-serif), serif;
 }
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-manrope {
+  font-family: var(--font-manrope), sans-serif;
+}
