@@ -18,7 +18,7 @@ async function Dashboard() {
   });
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center md:max-w-3xl px-4 py-6 mt-16">
+    <div className="flex min-h-screen w-full flex-col items-center md:max-w-7xl px-4 py-6 mt-12">
       <div className="flex max-w-full flex-col items-center gap-18">
         {user?.credits ? (
           <div className="flex flex-col px-10 gap-2">

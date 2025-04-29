@@ -139,7 +139,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
           <div className="h-3 w-3 bg-black rounded-full animate-bounce"></div>
         </div>
       ) : imageSrc ? (
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-4 ">
           {/* <img src={imageSrc} alt="Uploaded" className="rounded-lg max-w-full" /> */}
           <div className="flex items-center justify-start w-full max-w-lg">
             <button
