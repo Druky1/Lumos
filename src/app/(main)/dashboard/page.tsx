@@ -18,17 +18,17 @@ async function Dashboard() {
   });
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center md:max-w-7xl px-4 py-6 mt-12">
-      <div className="flex max-w-full flex-col items-center gap-18">
+    <div className="flex min-h-screen w-full flex-col items-center md:max-w-7xl mx-auto px-4 py-6 mt-12">
+      <div className="w-full">
         {user?.credits ? (
-          <div className="flex flex-col px-10 gap-2">
-            {/* The Thumbnail component will handle showing/hiding this content */}
+          <div className="w-full">
+            {/* The Thumbnail component will handle showing/hiding content */}
             <Thumbnail 
               userName={serverSession?.user.name ? serverSession.user.name : "Guest"}
             />
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4 max-w-2xl mt-24 text-center">
+          <div className="flex flex-col items-center gap-4 max-w-2xl mt-24 text-center mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-instrument-serif tracking-tight">
               Oops! You're out of credits!
             </h1>

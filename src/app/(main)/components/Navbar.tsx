@@ -1,4 +1,5 @@
 import Credits from "@/app/_components/Credits";
+import { ModeToggle } from "@/app/_components/ModeToggle";
 import SignOut from "@/app/_components/SignOut";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -23,6 +24,7 @@ function Navbar() {
           </Button>
         </Link>
         <SignOut/>
+        <ModeToggle/>
       </div>
     </nav>
   );

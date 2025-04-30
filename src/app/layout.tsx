@@ -4,6 +4,7 @@ import {Inter, Host_Grotesk, Instrument_Serif, Manrope } from "next/font/google"
 import "./globals.css";
 import { Providers } from "./provider";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from 'next-themes'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,13 +40,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${hostGrotesk.className} ${instrumentSerif.variable} ${inter.variable} ${manrope.variable} antialiased`}
       >
-        <Providers>
-        {children}
-        </Providers>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Providers>
+            {children}
+          </Providers>
+        </ThemeProvider>
         <Toaster richColors/>
       </body>
     </html>

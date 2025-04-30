@@ -1,12 +1,23 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Dropzone from "./Dropzone";
 import Style from "./Style";
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "@/components/ui/button";
 import { FiDownload } from "react-icons/fi";
 import { ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const thumbnailStyles = {
   style1: {
@@ -42,6 +53,45 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   );
   const [canvasReady, setCanvasReady] = useState(false);
   const [text, setText] = useState("GLOW");
+  const [textColor, setTextColor] = useState(() => {
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].color;
+  });
+  const [textOpacity, setTextOpacity] = useState(() => {
+    return (
+      thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].opacity *
+      100
+    );
+  });
+  const [pendingColorUpdate, setPendingColorUpdate] = useState<string | null>(
+    null
+  );
+  const [pendingOpacityUpdate, setPendingOpacityUpdate] = useState<
+    number | null
+  >(null);
+  const [fontSize, setFontSize] = useState(() => {
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles]
+      .fontSize;
+  });
+  const [fontFamily, setFontFamily] = useState(() => {
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles]
+      .fontFamily;
+  });
+  const [fontWeight, setFontWeight] = useState(() => {
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles]
+      .fontWeight;
+  });
+  const colorUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const opacityUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const style =
+      thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles];
+    setTextColor(style.color);
+    setTextOpacity(style.opacity * 100);
+    setFontSize(style.fontSize);
+    setFontFamily(style.fontFamily);
+    setFontWeight(style.fontWeight);
+  }, [selectedStyle]);
 
   const setSelectedImage = async (file?: File) => {
     if (file) {
@@ -61,49 +111,80 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     }
   };
 
+  
+  useEffect(() => {
+    if (pendingColorUpdate !== null) {
+      if (colorUpdateTimeoutRef.current) {
+        clearTimeout(colorUpdateTimeoutRef.current);
+      }
+      colorUpdateTimeoutRef.current = setTimeout(() => {
+        setTextColor(pendingColorUpdate);
+        setPendingColorUpdate(null);
+      }, 100); // 100ms debounce
+    }
+    return () => {
+      if (colorUpdateTimeoutRef.current) {
+        clearTimeout(colorUpdateTimeoutRef.current);
+      }
+    };
+  }, [pendingColorUpdate]);
+
+  
+  useEffect(() => {
+    if (pendingOpacityUpdate !== null) {
+      if (opacityUpdateTimeoutRef.current) {
+        clearTimeout(opacityUpdateTimeoutRef.current);
+      }
+      opacityUpdateTimeoutRef.current = setTimeout(() => {
+        setTextOpacity(pendingOpacityUpdate);
+        setPendingOpacityUpdate(null);
+      }, 0); 
+    }
+    return () => {
+      if (opacityUpdateTimeoutRef.current) {
+        clearTimeout(opacityUpdateTimeoutRef.current);
+      }
+    };
+  }, [pendingOpacityUpdate]);
+
   useEffect(() => {
     if (canvasReady) {
       drawCompImage();
     }
-  }, [canvasReady]);
+  }, [
+    canvasReady,
+    text,
+    textColor,
+    textOpacity,
+    fontSize,
+    fontFamily,
+    fontWeight,
+  ]);
 
-  const drawCompImage = () => {
+  const drawCompImage = useCallback(() => {
     if (!canvasRef.current || !canvasReady || !imageSrc || !processedImageSrc)
       return;
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
     const image = new Image();
     image.onload = () => {
       canvas.width = image.width;
       canvas.height = image.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-      let preset = thumbnailStyles.style1;
-      switch (selectedStyle) {
-        case "style1":
-          preset = thumbnailStyles.style1;
-          break;
-        case "style2":
-          preset = thumbnailStyles.style2;
-          break;
-        case "style3":
-          preset = thumbnailStyles.style3;
-          break;
-        default:
-          preset = thumbnailStyles.style1;
-          break;
-      }
       ctx.save();
 
       // Calculating font size to fill image 90% width
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      const fontSize = Number(preset.fontSize);
-      ctx.font = `${preset.fontWeight} ${fontSize}px ${preset.fontFamily}`;
-      ctx.fillStyle = preset.color;
-      ctx.globalAlpha = preset.opacity;
+      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      ctx.fillStyle = textColor;
+      ctx.globalAlpha = textOpacity / 100;
 
       const x = canvas.width / 2;
       const y = canvas.height / 2;
@@ -119,7 +200,17 @@ const Thumbnail = ({ userName }: { userName: string }) => {
       fgImage.src = processedImageSrc;
     };
     image.src = imageSrc;
-  };
+  }, [
+    canvasReady,
+    imageSrc,
+    processedImageSrc,
+    text,
+    textColor,
+    textOpacity,
+    fontSize,
+    fontFamily,
+    fontWeight,
+  ]);
 
   const handleDownloadImage = async () => {
     if (canvasRef.current) {
@@ -130,42 +221,152 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     }
   };
 
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    setPendingColorUpdate(newColor);
+  };
+
+  const handleFontFamilyChange = (value: string) => {
+    setFontFamily(value);
+  };
+
+  const handleFontSizeChange = (values: number[]) => {
+    setFontSize(values[0]);
+  };
+
+  const handleOpacityChange = (values: number[]) => {
+    const newOpacity = values[0];
+    setPendingOpacityUpdate(newOpacity);
+  };
+
   return (
     <>
       {loading ? (
         <div className="flex justify-center items-center gap-1 mt-48">
-          <div className="h-3 w-3 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-          <div className="h-3 w-3 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-          <div className="h-3 w-3 bg-black rounded-full animate-bounce"></div>
+          <div className="h-3 w-3 bg-black dark:bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="h-3 w-3 bg-black dark:bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="h-3 w-3 bg-black dark:bg-white rounded-full animate-bounce"></div>
         </div>
       ) : imageSrc ? (
-        <div className="flex flex-col items-center justify-center gap-4 ">
-          {/* <img src={imageSrc} alt="Uploaded" className="rounded-lg max-w-full" /> */}
-          <div className="flex items-center justify-start w-full max-w-lg">
-            <button
-              onClick={() => {
-                setImageSrc(null);
-                setProcessedImageSrc(null);
-                setCanvasReady(false);
-              }}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Back</span>
-            </button>
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column - Image Preview */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center mb-2">
+                <button
+                  onClick={() => {
+                    setImageSrc(null);
+                    setProcessedImageSrc(null);
+                    setCanvasReady(false);
+                  }}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm">Back</span>
+                </button>
+              </div>
+
+              <canvas
+                ref={canvasRef}
+                className="w-full rounded-lg max-h-[600px] object-contain"
+              ></canvas>
+
+              <Button
+                onClick={handleDownloadImage}
+                className="mt-2 cursor-pointer flex items-center justify-center gap-2"
+              >
+                Download
+                <FiDownload className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Right Column - Editing Controls */}
+            <div className="flex flex-col gap-4 md:mt-10">
+              <Card>
+                <CardContent className="space-y-6 pt-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="text-input">Text</Label>
+                    <Input
+                      id="text-input"
+                      value={text}
+                      onChange={handleTextChange}
+                      placeholder="Enter text for thumbnail"
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="color-picker">Text Color</Label>
+                      <Input
+                        id="color-picker"
+                        type="color"
+                        value={textColor}
+                        onChange={handleColorChange}
+                        className="h-10 cursor-pointer"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="font-family">Font Family</Label>
+                      <Select
+                        value={fontFamily}
+                        onValueChange={handleFontFamilyChange}
+                        defaultValue="Instrument Serif"
+                      >
+                        <SelectTrigger id="font-family">
+                          <SelectValue placeholder="Select font" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Instrument Serif">
+                            Instrument Serif
+                          </SelectItem>
+                          <SelectItem value="Inter">Inter</SelectItem>
+                          <SelectItem value="Manrope">Manrope</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label htmlFor="font-size-slider">Font Size</Label>
+                    </div>
+                    <Slider
+                      id="font-size-slider"
+                      min={100}
+                      max={1000}
+                      step={10}
+                      value={[fontSize]}
+                      onValueChange={handleFontSizeChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label htmlFor="opacity-slider">Text Opacity</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {pendingOpacityUpdate !== null
+                          ? pendingOpacityUpdate
+                          : textOpacity}
+                        %
+                      </span>
+                    </div>
+                    <Slider
+                      id="opacity-slider"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={[textOpacity]}
+                      onValueChange={handleOpacityChange}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-          <canvas
-            ref={canvasRef}
-            className="max-h-lg h-auto w-full max-w-lg rounded-lg "
-          ></canvas>
-          <Button
-            onClick={handleDownloadImage}
-            className="mt-2 cursor-pointer md:w-full flex items-center"
-          >
-            Download
-            <FiDownload className="w-4 h-4" />
-          </Button>
-          {/* Add any other UI elements for when the image is processed */}
         </div>
       ) : (
         <>
