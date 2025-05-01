@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useUploadThing } from "@/lib/uploadthing";
 import Dropzone from "./Dropzone";
 import Style from "./Style";
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "@/components/ui/button";
 import { FiDownload } from "react-icons/fi";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const thumbnailStyles = {
   style1: {
@@ -83,6 +85,50 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   const colorUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const opacityUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const { startUpload } = useUploadThing("imageUploader", {
+    onClientUploadComplete: () => {
+      setIsUploading(false);
+      setUploadProgress(100);
+      toast.success("Thumbnail saved successfully!");
+    },
+    onUploadError: (error) => {
+      setIsUploading(false);
+      setUploadProgress(0);
+      toast.error("Error saving thumbnail. Please check your credits!");
+      console.error("Upload error:", error);
+    },
+    onUploadProgress: (progress) => {
+      setUploadProgress(progress);
+    },
+  });
+
+  const handleSaveThumbnail = async () => {
+    if (!canvasRef.current) return;
+  
+    setIsUploading(true);
+    setUploadProgress(0);
+  
+    try {
+      // converting canvas to file
+      const dataUrl = canvasRef.current.toDataURL("image/png");
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `thumbnail-${Date.now()}.png`, {
+        type: "image/png",
+      });
+  
+      // upload 
+      await startUpload([file]);
+    } catch (error) {
+      setIsUploading(false);
+      toast.error("Unable to save thumbnail. Please try again later.");
+      console.error("Error saving thumbnail:", error);
+    }
+  };
+
   useEffect(() => {
     const style =
       thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles];
@@ -111,7 +157,6 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     }
   };
 
-  
   useEffect(() => {
     if (pendingColorUpdate !== null) {
       if (colorUpdateTimeoutRef.current) {
@@ -129,7 +174,6 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     };
   }, [pendingColorUpdate]);
 
-  
   useEffect(() => {
     if (pendingOpacityUpdate !== null) {
       if (opacityUpdateTimeoutRef.current) {
@@ -138,7 +182,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
       opacityUpdateTimeoutRef.current = setTimeout(() => {
         setTextOpacity(pendingOpacityUpdate);
         setPendingOpacityUpdate(null);
-      }, 0); 
+      }, 0);
     }
     return () => {
       if (opacityUpdateTimeoutRef.current) {
@@ -281,6 +325,17 @@ const Thumbnail = ({ userName }: { userName: string }) => {
               >
                 Download
                 <FiDownload className="w-4 h-4" />
+              </Button>
+              <Button
+                onClick={handleSaveThumbnail}
+                className="flex-1 cursor-pointer flex items-center justify-center gap-2"
+                disabled={isUploading}
+                variant="outline"
+              >
+                {isUploading
+                  ? `Saving (${uploadProgress}%)`
+                  : "Save Thumbnail"}
+                <Save className="w-4 h-4" />
               </Button>
             </div>
 

@@ -61,6 +61,8 @@ model User {
     posts         Post[]
     password      String?
     credits       Int       @default(2)
+
+    thumbnails Thumbnail[]
 }
 
 model VerificationToken {
@@ -69,4 +71,17 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Thumbnail {
+    id        String   @id @default(cuid())
+    userId    String
+    url       String
+    key       String
+    name      String
+    createdAt DateTime @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
