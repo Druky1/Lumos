@@ -41,15 +41,6 @@ export const ourFileRouter = {
       })
       if(!user?.credits) throw new Error("You don't have enough credits to upload a thumbnail!");
 
-      await db.user.update({
-        where: {
-          id: userId.id,
-        },
-        data: {
-          credits: {
-            decrement: 1},
-        },
-      })
       return { userId: userId.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {

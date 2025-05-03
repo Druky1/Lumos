@@ -3,7 +3,6 @@
 import db from "@/lib/prisma";
 import { signInSchema } from "@/schema/auth";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 
 export const signup = async (email: string, password: string) => {
   try {

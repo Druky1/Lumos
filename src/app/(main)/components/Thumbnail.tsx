@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { creditDeduction, revalidate, checkCredits } from "@/app/actions/generate";
 
 const thumbnailStyles = {
   style1: {
@@ -50,9 +51,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [processedImageSrc, setProcessedImageSrc] = useState<string | null>(
-    null
-  );
+  const [processedImageSrc, setProcessedImageSrc] = useState<string | null>(null);
   const [canvasReady, setCanvasReady] = useState(false);
   const [text, setText] = useState("GLOW");
   const [textColor, setTextColor] = useState(() => {
@@ -60,27 +59,19 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   });
   const [textOpacity, setTextOpacity] = useState(() => {
     return (
-      thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].opacity *
-      100
+      thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].opacity * 100
     );
   });
-  const [pendingColorUpdate, setPendingColorUpdate] = useState<string | null>(
-    null
-  );
-  const [pendingOpacityUpdate, setPendingOpacityUpdate] = useState<
-    number | null
-  >(null);
+  const [pendingColorUpdate, setPendingColorUpdate] = useState<string | null>(null);
+  const [pendingOpacityUpdate, setPendingOpacityUpdate] = useState<number | null>(null);
   const [fontSize, setFontSize] = useState(() => {
-    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles]
-      .fontSize;
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].fontSize;
   });
   const [fontFamily, setFontFamily] = useState(() => {
-    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles]
-      .fontFamily;
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].fontFamily;
   });
   const [fontWeight, setFontWeight] = useState(() => {
-    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles]
-      .fontWeight;
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].fontWeight;
   });
   const colorUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const opacityUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -89,15 +80,22 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const { startUpload } = useUploadThing("imageUploader", {
-    onClientUploadComplete: () => {
+    onClientUploadComplete: async () => {
       setIsUploading(false);
       setUploadProgress(100);
       toast.success("Thumbnail saved successfully!");
+      const result = await creditDeduction();
+      if (!result.success) {
+        toast.error("Error deducting credits");
+      } else {
+       
+        await revalidate();
+      }
     },
     onUploadError: (error) => {
       setIsUploading(false);
       setUploadProgress(0);
-      toast.error("Error saving thumbnail. Please check your credits!");
+      toast.error("Error saving thumbnail. Please try again later.");
       console.error("Upload error:", error);
     },
     onUploadProgress: (progress) => {
@@ -107,6 +105,11 @@ const Thumbnail = ({ userName }: { userName: string }) => {
 
   const handleSaveThumbnail = async () => {
     if (!canvasRef.current) return;
+    const creditCheck = await checkCredits();
+    if (!creditCheck.success || (creditCheck.credits ?? 0) < 1) {
+      toast.error("Not enough credits to save thumbnail!");
+      return;
+    }
   
     setIsUploading(true);
     setUploadProgress(0);
@@ -130,8 +133,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   };
 
   useEffect(() => {
-    const style =
-      thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles];
+    const style = thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles];
     setTextColor(style.color);
     setTextOpacity(style.opacity * 100);
     setFontSize(style.fontSize);
@@ -141,17 +143,29 @@ const Thumbnail = ({ userName }: { userName: string }) => {
 
   const setSelectedImage = async (file?: File) => {
     if (file) {
+      // checking credits before processing the image
+      const creditCheck = await checkCredits();
+      if (!creditCheck.success || (creditCheck.credits ?? 0) < 1) {
+        toast.error("Not enough credits to process image!");
+        return;
+      }
+
       setLoading(true);
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const src = e.target?.result as string;
-        setImageSrc(src);
-        // Don't forget to set loading to false when done
-        const blob = await removeBackground(src);
-        const processedUrl = URL.createObjectURL(blob);
-        setProcessedImageSrc(processedUrl);
-        setCanvasReady(true);
-        setLoading(false);
+        try {
+          const src = e.target?.result as string;
+          setImageSrc(src);
+          const blob = await removeBackground(src);
+          const processedUrl = URL.createObjectURL(blob);
+          setProcessedImageSrc(processedUrl);
+          setCanvasReady(true);
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          toast.error("Error processing image. Please try again.");
+          console.error("Error removing background:", error);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -222,7 +236,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
 
       ctx.save();
 
-      // Calculating font size to fill image 90% width
+      // Ccalculating font size to fill image 90% width
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -306,6 +320,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
                     setImageSrc(null);
                     setProcessedImageSrc(null);
                     setCanvasReady(false);
+                    revalidate();
                   }}
                   className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
