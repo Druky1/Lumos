@@ -86,3 +86,50 @@ export const creditDeduction = async () => {
 export const revalidate = async () => {
   revalidatePath("/dashboard");
 }
+
+export const getUserSubscriptionStatus = async () => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return { 
+        success: false, 
+        isPremium: false, 
+        message: "Not authenticated" 
+      };
+    }
+    
+    const user = await db.user.findUnique({
+      where: {
+        id: session.user.id
+      },
+      select: {
+        credits: true
+      }
+    });
+
+    if (!user) {
+      return { 
+        success: false, 
+        isPremium: false, 
+        message: "User not found" 
+      };
+    }
+
+    // User is premium if they have more than 2 credits
+    const isPremium = user.credits > 2;
+    
+    return {
+      success: true,
+      isPremium,
+      credits: user.credits,
+      message: "Subscription status retrieved successfully"
+    };
+  } catch (error) {
+    console.error("Error getting subscription status:", error);
+    return { 
+      success: false, 
+      isPremium: false, 
+      message: "Failed to check subscription status" 
+    };
+  }
+};
