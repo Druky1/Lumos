@@ -12,7 +12,7 @@ function Navbar() {
     <nav className="flex w-full items-center justify-between px-6">
       <div>
         <Link
-          href="/"
+          href="/dashboard"
           className="text-3xl font-instrument-serif tracking-tight"
         >
           Lumos
