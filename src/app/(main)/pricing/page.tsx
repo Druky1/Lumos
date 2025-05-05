@@ -35,7 +35,7 @@ const Pricing = () => {
         if (status.success) {
           setIsPremium(status.isPremium);
         } else {
-          // Handle case where user is not authenticated
+          
           console.error("Subscription check failed:", status.message);
         }
       } catch (error) {
@@ -49,9 +49,7 @@ const Pricing = () => {
   }, []);
 
   const handleUpgrade = async () => {
-    // This would redirect to your payment processor or subscription page
-    // For now, we'll just redirect to a mock payment page
-    router.push("/payment");
+    router.push("/payment"); // need to make this
   };
 
   return (
@@ -129,7 +127,6 @@ const Pricing = () => {
                 ))}
               </div>
             </CardContent>
-            
             <CardFooter>
               <Button 
                 variant={isPremium ? "outline" : "default"} 

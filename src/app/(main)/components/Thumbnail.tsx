@@ -38,7 +38,7 @@ const thumbnailStyles = {
     opacity: 0.9,
   },
   style3: {
-    fontSize: 600,
+    fontSize: 200,
     fontFamily: "Manrope",
     fontWeight: 600,
     color: "white",

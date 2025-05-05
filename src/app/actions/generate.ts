@@ -133,3 +133,30 @@ export const getUserSubscriptionStatus = async () => {
     };
   }
 };
+
+export const fetchThumbnails = async () => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return { success: false, message: "Not authenticated" };
+
+    const thumbnails = await db.thumbnail.findMany({
+      where: {
+        userId: session.user.id
+      },
+      orderBy: {
+        createdAt: "desc"
+      },
+      select: {
+        url: true,
+        id: true,
+        createdAt: true,
+      }
+    })
+
+    return { success: true, thumbnails };
+  }
+  catch(error){
+    console.error("Error fetching thumbnails:", error);
+    return { success: false, message: "Failed to fetch thumbnails" };
+  }
+}

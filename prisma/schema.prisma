@@ -60,7 +60,7 @@ model User {
     sessions      Session[]
     posts         Post[]
     password      String?
-    credits       Int       @default(2)
+    credits       Int       @default(5)
 
     thumbnails Thumbnail[]
 }
