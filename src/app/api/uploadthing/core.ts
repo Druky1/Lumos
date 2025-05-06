@@ -6,7 +6,7 @@ import db from "@/lib/prisma";
 
 const f = createUploadthing();
 
-export const auth = async (req: Request) => {
+export const auth = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) return null;
@@ -19,13 +19,13 @@ export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
   imageUploader: f({
     image: {
-      maxFileSize: "8MB",
+      maxFileSize: "16MB",
       maxFileCount: 1,
     },
   })
-    .middleware(async ({ req }) => {
+    .middleware(async () => {
       
-      const userId = await auth(req);
+      const userId = await auth();
            
       if (!userId) throw new UploadThingError("Unauthorized");
 
