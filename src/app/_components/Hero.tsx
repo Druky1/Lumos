@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-
 const impactTexts = ["convert", "stands out", "drives clicks", "gets results"];
 
 const Hero = () => {
