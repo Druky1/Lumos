@@ -4,7 +4,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import db from "@/lib/prisma";
 
-
 const f = createUploadthing();
 
 export const auth = async (req: Request) => {
@@ -24,7 +23,6 @@ export const ourFileRouter = {
       maxFileCount: 1,
     },
   })
-    
     .middleware(async ({ req }) => {
       
       const userId = await auth(req);
@@ -38,8 +36,9 @@ export const ourFileRouter = {
         select: {
           credits: true,
         },
-      })
-      if(!user?.credits) throw new Error("You don't have enough credits to upload a thumbnail!");
+      });
+      
+      if (!user?.credits) throw new UploadThingError("You don't have enough credits to upload a thumbnail!");
 
       return { userId: userId.id };
     })
@@ -54,10 +53,9 @@ export const ourFileRouter = {
           name: file.name,
           key: file.key,
         }
-      })
+      });
 
       console.log("Upload complete for userId:", metadata.userId);
-
       console.log("file url", file.ufsUrl);
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback

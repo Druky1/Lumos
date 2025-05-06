@@ -2,7 +2,6 @@ import { customAdapter } from './auth-adapter';
 import GoogleProvider from "next-auth/providers/google";
 import db from "@/lib/prisma";
 import { NextAuthOptions } from "next-auth";
-import { Adapter } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { signInSchema } from "@/schema/auth";
 import bcrypt from "bcryptjs";

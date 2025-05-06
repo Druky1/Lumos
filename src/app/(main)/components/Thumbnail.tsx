@@ -8,7 +8,7 @@ import { removeBackground } from "@imgly/background-removal";
 import { Button } from "@/components/ui/button";
 import { FiDownload } from "react-icons/fi";
 import { ArrowLeft, Save } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { creditDeduction, revalidate, checkCredits } from "@/app/actions/generate";
+import { RoughNotation } from "react-rough-notation";
+import { useTheme } from "next-themes";
 
 const thumbnailStyles = {
   style1: {
@@ -47,6 +49,7 @@ const thumbnailStyles = {
 };
 
 const Thumbnail = ({ userName }: { userName: string }) => {
+  const {theme} = useTheme()
   const [selectedStyle, setSelectedStyle] = useState("style1");
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -205,19 +208,6 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     };
   }, [pendingOpacityUpdate]);
 
-  useEffect(() => {
-    if (canvasReady) {
-      drawCompImage();
-    }
-  }, [
-    canvasReady,
-    text,
-    textColor,
-    textOpacity,
-    fontSize,
-    fontFamily,
-    fontWeight,
-  ]);
 
   const drawCompImage = useCallback(() => {
     if (!canvasRef.current || !canvasReady || !imageSrc || !processedImageSrc)
@@ -268,6 +258,21 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     fontSize,
     fontFamily,
     fontWeight,
+  ]);
+
+  useEffect(() => {
+    if (canvasReady) {
+      drawCompImage();
+    }
+  }, [
+    canvasReady,
+    text,
+    textColor,
+    textOpacity,
+    fontSize,
+    fontFamily,
+    fontWeight,
+    drawCompImage
   ]);
 
   const handleDownloadImage = async () => {
@@ -443,10 +448,13 @@ const Thumbnail = ({ userName }: { userName: string }) => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-instrument-serif tracking-tight text-center">
             Hello! {userName}
           </h1>
-          <h2 className="text-md md:text-lg lg:text-lg tracking-tight text-center text-muted-foreground">
+          <h2 className="text-md md:text-lg lg:text-lg tracking-tight text-center text-primary-foreground mt-2">
+            <RoughNotation type="highlight" show={true} color={theme === "dark" ? "white" : "black"}>
+
             Get started by creating beautiful thumbnails for your content
+            </RoughNotation>
           </h2>
-          <div className="mt-6 mb-6 flex flex-col items-center justify-between md:flex-row md:items-start gap-6">
+          <div className="mt-6 mb-6 flex flex-col items-center justify-between md:flex-row md:items-start gap-4 ">
             <Style
               image="/thumbnail1.png"
               selectStyle={() => setSelectedStyle("style1")}

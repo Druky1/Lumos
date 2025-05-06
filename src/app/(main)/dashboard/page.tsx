@@ -30,7 +30,7 @@ async function Dashboard() {
         ) : (
           <div className="flex flex-col items-center gap-4 max-w-2xl mt-24 text-center mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-instrument-serif tracking-tight">
-              Oops! You're out of credits!
+              Oops! You&apos;re out of credits!
             </h1>
             <span className="text-sm text-muted-foreground">
               Please purchase more credits to continue creating captivating

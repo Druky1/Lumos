@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getUserSubscriptionStatus } from "@/app/actions/generate";
 import { useRouter } from "next/navigation";
 import { FiCheck } from "react-icons/fi";
+import { RoughNotation } from "react-rough-notation";
 
 const freeFeatures = [
   "2 free generations / account",
@@ -67,7 +68,11 @@ const Pricing = () => {
       <div className="flex flex-col items-center justify-center gap-8 max-w-6xl">
         <div className="text-center p-2 mt-10">
           <p className="text-lg text-muted-foreground mb-2">One subscription. Unlimited thumbnails.</p>
-          <h1 className="text-2xl md:text-3xl mx-auto">Choose a plan that works for you</h1>
+          <h1 className="text-2xl md:text-3xl mx-auto">
+            <RoughNotation type="box" show={true}>
+            Choose a plan that works for you
+              </RoughNotation>
+            </h1>
         </div>
         
         <div className="flex flex-col md:flex-row items-stretch justify-center gap-8">

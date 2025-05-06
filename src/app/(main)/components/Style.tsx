@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const Style = ({
   image,
@@ -18,13 +19,22 @@ const Style = ({
         scale: 1.05, 
         transition: { duration: 0.2 } 
       }}
-      className="relative w-fit cursor-pointer"
+      className="relative cursor-pointer"
     >
-      
       <motion.div 
-        className={`relative rounded-lg z-10`}
+        className="relative rounded-lg z-10 overflow-hidden"
       >
-        <img src={image} alt="" className="min-w-72 rounded-lg" />
+        <div className="w-95 h-56 relative">
+          <Image 
+            src={image} 
+            alt="thumbnail style" 
+            fill
+            sizes="(max-width: 768px) 100vw, 288px"
+            className="object-cover rounded-lg"
+            priority
+          />
+        </div>
+        
         {isSelected && (
           <motion.div
             initial={{ scale: 0 }}

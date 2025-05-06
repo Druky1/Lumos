@@ -22,13 +22,15 @@ function Navbar() {
         <Credits />
         <Link href={"/dashboard/thumbnails"}>
           <Button className="cursor-pointer text-sm">
-            Your Gallery
+            <span className="hidden md:block">Your Gallery</span>
             <GrGallery className="h-4 w-4" />
           </Button>
         </Link>
         <Link href="/pricing">
           <Button className="cursor-pointer text-sm">
-            Upgrade <HiOutlineSparkles className="h-4 w4"></HiOutlineSparkles>
+            <span className="hidden md:block">
+              Upgrade
+            </span> <HiOutlineSparkles className="h-4 w4"></HiOutlineSparkles>
           </Button>
         </Link>
         <SignOut />

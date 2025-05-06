@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Download } from "lucide-react";
 import { fetchThumbnails } from "@/app/actions/generate"; // Import your server action
+import Image from "next/image";
+import { RoughNotation } from "react-rough-notation";
 
 interface Thumbnail {
   id: string;
@@ -79,9 +81,13 @@ const Gallery = () => {
   return (
     <section className="flex flex-col mt-4 min-h-screen w-full py-12 md:py-24 px-4 tracking-tight">
       <div className="w-full mb-12">
-        <h1 className="text-3xl md:text-4xl">Your Recent Thumbnails</h1>
+          <h1 className="text-3xl md:text-4xl text-center">
+        <RoughNotation type="underline" show={true} >
+            Your Recent Thumbnails
+        </RoughNotation>
+          </h1>
       </div>
-      
+
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-64 w-full">
           <div className="h-10 w-10 rounded-full border-4 border-primary-foreground border-t-primary animate-spin mb-4"></div>
@@ -98,14 +104,18 @@ const Gallery = () => {
               thumbnails.map((thumbnail) => (
                 <Card
                   key={thumbnail.id}
-                  className="w-full h-67 flex items-center justify-center relative overflow-hidden cursor-pointer group shadow-lg"
+                  className="w-full h-64 flex items-center justify-center relative overflow-hidden cursor-pointer group shadow-lg"
                   onClick={() => handleThumbnailClick(thumbnail)}
                 >
-                  <img
-                    src={thumbnail.url}
-                    alt={`Thumbnail ${thumbnail.id}`}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  />
+                  <div className="w-full h-full relative">
+                    <Image
+                      src={thumbnail.url}
+                      alt={`Thumbnail ${thumbnail.id}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover transition-transform group-hover:scale-105"
+                    />
+                  </div>
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <p className="text-white text-sm">Click to view</p>
                   </div>
@@ -123,20 +133,23 @@ const Gallery = () => {
       )}
 
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent className="max-w-md">
+        <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {`Thumbnail ${selectedThumbnail?.id?.substring(0, 8)}`}
+              {selectedThumbnail?.name ||
+                `Thumbnail ${selectedThumbnail?.id?.substring(0, 8)}`}
             </AlertDialogTitle>
           </AlertDialogHeader>
 
           {selectedThumbnail && (
             <div className="space-y-4">
-              <div className="w-full h-64 overflow-hidden rounded-md border">
-                <img
+              <div className="w-full h-96 relative rounded-md border overflow-hidden">
+                <Image
                   src={selectedThumbnail.url}
                   alt={`Thumbnail ${selectedThumbnail.id}`}
-                  className="w-full h-full object-contain"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className="object-contain"
                 />
               </div>
 
@@ -162,7 +175,9 @@ const Gallery = () => {
           )}
 
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="cursor-pointer">Close</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">
+              Close
+            </AlertDialogCancel>
             <AlertDialogAction asChild>
               <a
                 href={selectedThumbnail?.url}
