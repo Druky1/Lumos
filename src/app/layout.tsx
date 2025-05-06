@@ -1,10 +1,14 @@
-
 import type { Metadata } from "next";
-import {Inter, Host_Grotesk, Instrument_Serif, Manrope } from "next/font/google";
+import {
+  Inter,
+  Host_Grotesk,
+  Instrument_Serif,
+  Manrope,
+} from "next/font/google";
 import "./globals.css";
 import { Providers } from "./provider";
 import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,7 +18,7 @@ const inter = Inter({
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
-})
+});
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -27,7 +31,6 @@ const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
   variable: "--font-host-grotesk",
 });
-
 
 export const metadata: Metadata = {
   title: "Lumos",
@@ -42,14 +45,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${hostGrotesk.className} ${instrumentSerif.variable} ${inter.variable} ${manrope.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Providers>
-            {children}
-          </Providers>
+          <Providers>{children}</Providers>
         </ThemeProvider>
-        <Toaster richColors/>
+        <Toaster richColors />
       </body>
     </html>
   );
