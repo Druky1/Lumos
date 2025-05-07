@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Druky1/Lumos/main/static/logo.png" alt="Lumos Logo" width="150" />
+</p>
 
-## Getting Started
+## 🌟 Overview
 
-First, run the development server:
+Generate stunning thumbnails by overlaying customizable text onto your images—no design skills required!
+
+🔗 Live Demo 
+🤝 Contribute
+
+
+## 🚀 Features
+
+1. Instant Preview - See your thumbnail update in real-time as you type.
+2. Custom Typography - Change font family, size, weight, color, and alignment.
+3. Drag & Drop - Upload images by dragging them onto the canvas.
+4. Responsive Export - Download your thumbnail in PNG or JPEG at HD resolutions.
+5. Preset Library - Start from one of several professionally designed templates.
+6. Undo/Redo History - Experiment freely, revert any change with a click.
+
+## 🛠️ Tech Stack
+
+### Frontend
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- shadcn/ui, magicui components
+- RoughNotation
+ 
+### Backend
+- Next.js API Routes
+- Next.js Server Actions
+- Prisma ORM
+- PostgreSQL (NeonDB)
+- UploadThing
+- NextAuth Authentication
+
+### Development
+- ESLint & Prettier
+- TypeScript strict mode
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- PostgreSQL database
+- UploadThing Storage Account
+- pnpm (recommended) or npm
+
+
+## 📦 Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/Druky1/Lumos.git
+```
+2. Install the dependencies
+```bash
+cd Lumos
+npm install
+```
+3. Set up environment variables
+```bash
+  cp .env or .env.local
+```
+4. Update `.env.local` or `.env` with your own credentials
+   ```bash
+   DATABASE_URL="postgresql://....."
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your_own_password"
+   GOOGLE_CLIENT_ID="your-google-client-id"
+   GOOGLE_CLIENT_SECRET="your-google-client-secret"
+   GOOGLE_CALLBACK_URL="https://localhost:<port>/api/auth/callback/google"
+   UPLOADTHING_TOKEN="your-uploadthing-token"
+   ```
+5. Run database migrations
+
+```bash
+npm prisma migrate dev
+```
+6. Start the project locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Voila! 😁, visit `http://localhost:3000` to see the app running!
+   
+## ⚙️ Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Upload your base image (JPG, PNG, or GIF).
+- Type your text to be placed on the image.
+- Customize fonts, colors, effects, and layout.
+- Export at up to 1920×1080 resolution for crisp thumbnails.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌟 Roadmap 
 
-## Learn More
+- More font & template packs
+- Batch export / zip download
+- Social-media–sized presets (Instagram, TikTok)
+- AI-powered text suggestions
 
-To learn more about Next.js, take a look at the following resources:
+Feel free to ⭐️ star the repo if you'd like to see these features!
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🤝 Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feat/YourIdea`)
+3. Commit your changes (`git commit -m "feat: add amazing feature"`)
+4. Push to your branch (`git push origin feat/YourIdea`)
+5. Open a Pull Request
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Website: https://lumos-iota-sable.vercel.app/
+* Email: official.spatra@gmail.com
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<p align="center"> Made with ❤️ by Soumik Patra </p>
