@@ -31,6 +31,8 @@ const thumbnailStyles = {
     fontWeight: 400,
     color: "white",
     opacity: 1,
+    xOffset: 0,
+    yOffset: 0,
   },
   style2: {
     fontSize: 500,
@@ -38,6 +40,8 @@ const thumbnailStyles = {
     fontWeight: 500,
     color: "#00997E",
     opacity: 0.9,
+    xOffset: 0,
+    yOffset: 0,
   },
   style3: {
     fontSize: 200,
@@ -45,6 +49,8 @@ const thumbnailStyles = {
     fontWeight: 600,
     color: "white",
     opacity: 0.8,
+    xOffset: 0,
+    yOffset: 0,
   },
 };
 
@@ -65,8 +71,16 @@ const Thumbnail = ({ userName }: { userName: string }) => {
       thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].opacity * 100
     );
   });
+  const [xOffset, setXOffset] = useState(() => {
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].xOffset;
+  });
+  const [yOffset, setYOffset] = useState(() => {
+    return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].yOffset;
+  });
   const [pendingColorUpdate, setPendingColorUpdate] = useState<string | null>(null);
   const [pendingOpacityUpdate, setPendingOpacityUpdate] = useState<number | null>(null);
+  const [pendingXOffsetUpdate, setPendingXOffsetUpdate] = useState<number | null>(null);
+  const [pendingYOffsetUpdate, setPendingYOffsetUpdate] = useState<number | null>(null);
   const [fontSize, setFontSize] = useState(() => {
     return thumbnailStyles[selectedStyle as keyof typeof thumbnailStyles].fontSize;
   });
@@ -78,6 +92,8 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   });
   const colorUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const opacityUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const xOffsetUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const yOffsetUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -142,6 +158,8 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     setFontSize(style.fontSize);
     setFontFamily(style.fontFamily);
     setFontWeight(style.fontWeight);
+    setXOffset(style.xOffset);
+    setYOffset(style.yOffset);
   }, [selectedStyle]);
 
   const setSelectedImage = async (file?: File) => {
@@ -208,6 +226,39 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     };
   }, [pendingOpacityUpdate]);
 
+  useEffect(() => {
+    if (pendingXOffsetUpdate !== null) {
+      if (xOffsetUpdateTimeoutRef.current) {
+        clearTimeout(xOffsetUpdateTimeoutRef.current);
+      }
+      xOffsetUpdateTimeoutRef.current = setTimeout(() => {
+        setXOffset(pendingXOffsetUpdate);
+        setPendingXOffsetUpdate(null);
+      }, 0);
+    }
+    return () => {
+      if (xOffsetUpdateTimeoutRef.current) {
+        clearTimeout(xOffsetUpdateTimeoutRef.current);
+      }
+    };
+  }, [pendingXOffsetUpdate]);
+
+  useEffect(() => {
+    if (pendingYOffsetUpdate !== null) {
+      if (yOffsetUpdateTimeoutRef.current) {
+        clearTimeout(yOffsetUpdateTimeoutRef.current);
+      }
+      yOffsetUpdateTimeoutRef.current = setTimeout(() => {
+        setYOffset(pendingYOffsetUpdate);
+        setPendingYOffsetUpdate(null);
+      }, 0);
+    }
+    return () => {
+      if (yOffsetUpdateTimeoutRef.current) {
+        clearTimeout(yOffsetUpdateTimeoutRef.current);
+      }
+    };
+  }, [pendingYOffsetUpdate]);
 
   const drawCompImage = useCallback(() => {
     if (!canvasRef.current || !canvasReady || !imageSrc || !processedImageSrc)
@@ -226,7 +277,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
 
       ctx.save();
 
-      // Ccalculating font size to fill image 90% width
+      // Calculating font size to fill image 90% width
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -234,8 +285,8 @@ const Thumbnail = ({ userName }: { userName: string }) => {
       ctx.fillStyle = textColor;
       ctx.globalAlpha = textOpacity / 100;
 
-      const x = canvas.width / 2;
-      const y = canvas.height / 2;
+      const x = canvas.width / 2 + (xOffset * canvas.width / 100); 
+      const y = canvas.height / 2 + (yOffset * canvas.height / 100); 
 
       ctx.translate(x, y);
       ctx.fillText(text, 0, 0, canvas.width * 0.9);
@@ -258,6 +309,8 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     fontSize,
     fontFamily,
     fontWeight,
+    xOffset,
+    yOffset,
   ]);
 
   useEffect(() => {
@@ -272,6 +325,8 @@ const Thumbnail = ({ userName }: { userName: string }) => {
     fontSize,
     fontFamily,
     fontWeight,
+    xOffset,
+    yOffset,
     drawCompImage
   ]);
 
@@ -304,6 +359,16 @@ const Thumbnail = ({ userName }: { userName: string }) => {
   const handleOpacityChange = (values: number[]) => {
     const newOpacity = values[0];
     setPendingOpacityUpdate(newOpacity);
+  };
+
+  const handleXOffsetChange = (values: number[]) => {
+    const newXOffset = values[0];
+    setPendingXOffsetUpdate(newXOffset);
+  };
+
+  const handleYOffsetChange = (values: number[]) => {
+    const newYOffset = values[0];
+    setPendingYOffsetUpdate(newYOffset);
   };
 
   return (
@@ -362,7 +427,7 @@ const Thumbnail = ({ userName }: { userName: string }) => {
             {/* Right Column - Editing Controls */}
             <div className="flex flex-col gap-4 md:mt-10">
               <Card>
-                <CardContent className="space-y-6 pt-6">
+                <CardContent className="space-y-6 pt-6 pb-2">
                   <div className="space-y-2">
                     <Label htmlFor="text-input">Text</Label>
                     <Input
@@ -436,6 +501,44 @@ const Thumbnail = ({ userName }: { userName: string }) => {
                       step={1}
                       value={[textOpacity]}
                       onValueChange={handleOpacityChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label htmlFor="x-position-slider">X Position</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {pendingXOffsetUpdate !== null
+                          ? pendingXOffsetUpdate
+                          : xOffset}
+                        %
+                      </span>
+                    </div>
+                    <Slider
+                      id="x-position-slider"
+                      min={-50}
+                      max={50}
+                      step={1}
+                      value={[xOffset]}
+                      onValueChange={handleXOffsetChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label htmlFor="y-position-slider">Y Position</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {pendingYOffsetUpdate !== null
+                          ? pendingYOffsetUpdate
+                          : yOffset}
+                        %
+                      </span>
+                    </div>
+                    <Slider
+                      id="y-position-slider"
+                      min={-50}
+                      max={50}
+                      step={1}
+                      value={[yOffset]}
+                      onValueChange={handleYOffsetChange}
                     />
                   </div>
                 </CardContent>

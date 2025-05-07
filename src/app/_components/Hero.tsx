@@ -15,10 +15,10 @@ const Hero = () => {
   
   return (
     <section className="relative min-h-screen flex items-center">
-      {/* Animated background elements */}
+      
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-white/5 blur-3xl"
+          className="absolute top-1/6 left-1/4 w-96 h-96 rounded-full bg-white/5 blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.2, 0.3, 0.2],
@@ -43,7 +43,7 @@ const Hero = () => {
         />
       </div>
 
-      {/* Hero content */}
+      
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
           <motion.div
