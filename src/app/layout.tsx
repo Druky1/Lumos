@@ -48,7 +48,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${hostGrotesk.className} ${instrumentSerif.variable} ${inter.variable} ${manrope.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Providers>{children}</Providers>
         </ThemeProvider>
         <Toaster richColors />
