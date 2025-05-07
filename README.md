@@ -1,13 +1,10 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Druky1/Lumos/main/static/logo.png" alt="Lumos Logo" width="150" />
+  <img src="https://raw.githubusercontent.com/Druky1/Lumos/main/lumos-logo.png" alt="Lumos Logo" width="400" height="200" />
 </p>
 
 ## 🌟 Overview
 
 Generate stunning thumbnails by overlaying customizable text onto your images—no design skills required!
-
-🔗 Live Demo 
-🤝 Contribute
 
 
 ## 🚀 Features
